@@ -21,13 +21,17 @@ class App {
     }
 
     private initializeMiddlewares() {
+        const origins = [
+            'http://localhost:3000',
+            'http://localhost:5173',
+            'http://192.168.25.75:3000',
+            'https://krystal-solutional-cherish.ngrok-free.dev'
+        ];
+        if (process.env.FRONTEND_URL) {
+            origins.push(process.env.FRONTEND_URL);
+        }
         this.app.use(cors({
-            origin: [
-                'http://localhost:3000',
-                'http://localhost:5173',
-                'http://192.168.25.75:3000',
-                'https://krystal-solutional-cherish.ngrok-free.dev'
-            ],
+            origin: origins,
             credentials: true
         }));
         this.app.use(express.json());

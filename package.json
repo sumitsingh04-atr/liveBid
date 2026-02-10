@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --watch src --watch index.ts --ext ts --exec ts-node index.ts",
     "build": "prisma generate && tsc",
-    "start": "node dist/index.js",
+    "start": "npx prisma migrate deploy && node dist/index.js",
     "tunnel": "ngrok http 9195"
   },
   "keywords": [],
