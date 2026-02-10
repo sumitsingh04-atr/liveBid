@@ -5,12 +5,14 @@ import socketService from '../websocket/socket.service';
 import logger from '../../../winston/logger';
 import IORedis from 'ioredis';
 
-const redisConnection = new IORedis({
-    host: process.env.REDIS_HOSTNAME || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-    ...(process.env.REDIS_AUTH ? { password: process.env.REDIS_AUTH } : {}),
-    maxRetriesPerRequest: null,
-});
+const redisConnection = process.env.REDIS_URL
+    ? new IORedis(process.env.REDIS_URL, { maxRetriesPerRequest: null })
+    : new IORedis({
+        host: process.env.REDIS_HOSTNAME || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+        ...(process.env.REDIS_AUTH ? { password: process.env.REDIS_AUTH } : {}),
+        maxRetriesPerRequest: null,
+    });
 
 export const auctionQueue = new Queue('auctionQueue', {
     connection: redisConnection,

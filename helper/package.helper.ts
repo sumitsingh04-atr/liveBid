@@ -15,6 +15,7 @@ const config = {
         password: process.env.DB_PASSWORD || '',
     },
     redis: {
+        url: process.env.REDIS_URL, // Support full connection string
         host: process.env.REDIS_HOSTNAME,
         port: process.env.REDIS_PORT,
         auth: process.env.REDIS_AUTH,
@@ -22,7 +23,7 @@ const config = {
         redisUserTokenDb: process.env.REDIS_USER_TOKEN_DB
     },
     kafka: {
-        brokers: [process.env.KAFKA_BROKER || 'localhost:9092']
+        brokers: process.env.KAFKA_BROKERS ? process.env.KAFKA_BROKERS.split(',') : [process.env.KAFKA_BROKER || 'localhost:9092']
     }
 };
 
@@ -38,17 +39,9 @@ export const InitConnections = async () => {
         Redis = new Helpers.redisHelper(config.redis);
         logger.info('Redis Connection initialized.');
 
-        // Initialize Kafka (Optional)
-        if (process.env.SKIP_KAFKA !== 'true') {
-            try {
-                await KafkaHelper.connect(config.kafka);
-                logger.info('Kafka Connection initialized.');
-            } catch (kafkaError) {
-                logger.warn('Failed to initialize Kafka. Continuing without Kafka. Set SKIP_KAFKA=true to suppress this warning.');
-            }
-        } else {
-            logger.info('Kafka initialization skipped due to SKIP_KAFKA=true');
-        }
+        // Initialize Kafka
+        await KafkaHelper.connect(config.kafka);
+        logger.info('Kafka Connection initialized.');
 
         // Initialize Prisma
         const pool = new Pool({ connectionString: process.env.DATABASE_URL });
